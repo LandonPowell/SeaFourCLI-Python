@@ -11,6 +11,7 @@ sizeY,sizeX = screen.getmaxyx()
 # Format for newwin is sizey, sizex, startposy, startposx
 # Messages contains all messages.
 messages = curses.newwin(curses.LINES, curses.COLS-32, 0,0)
+messageList = []
 
 # Message box contains message txt, for the sake of .box()
 messageBox = curses.newwin(6,31,sizeY-6,sizeX-31)
@@ -22,13 +23,16 @@ message = ""
 # The name prescribes the type of emit to listen for.
 class listeners:
     def userMessage(*args):
-        message = "Testing the userMessage listener"
+        messageList += ["Testing the userMessage listener"]
 
 # Sets all listeners.
 for function in listeners.__dict__:
     socket.on(function, listeners.__dict__[function])
+socket.wait_for_callbacks()
 
-while True:
+while message != "kill":
+    for x in messageList:
+        messages.addstr(0,0, x)
     messageTxt.addstr(0,0, message)
 
     screen    .refresh()
@@ -37,7 +41,6 @@ while True:
     messageTxt.refresh()
 
     # Keypress handler.
-    socket.wait_for_callbacks()
     char = screen.getkey()
     if char == "\n":
         socket.emit('userMessage', message)

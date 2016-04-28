@@ -11,9 +11,6 @@ var screen = blessed.screen({
     }
 });
 
-/* Sets your Term title to 'SeaFour'. */
-screen.title = "SeaFour";
-
 /* Holds the end-user's input. */
 var inputBox = blessed.textarea({
 
@@ -34,13 +31,14 @@ inputBox.enableDrag();
 screen.append(inputBox);
 
 /* Holds other user's messages. */
-var messages = blessed.box({
-    top:        0,
-    left:       0,
-    width:      '69%',
-    shrink:     true,
-    scrollable: true,
-    tags:       true
+var messages = blessed.log({
+    top:            1,
+    left:           1,
+    bottom:         1,
+    width:          '67%',
+    scrollOnInput:  true,
+    tags:           true,
+    border:         { type: 'line' }
 });
 screen.append(messages);
 
@@ -49,21 +47,13 @@ screen.render();
 /* - SOCKET LISTENERS - */
 
 socket.on('userMessage', function(nick, post, id, flair) {
-    var newMessage = blessed.box({
-        content:    nick + " : " + post,
-        right:      1,
-        left:       1,
-        shrink:     true,
-        border:     { type: 'line' },
-    });
-    messages.append(newMessage);
-    messages.scroll(20);
-    screen.render();
+    messages.add("{magenta-fg}" + nick + "{/} : " + post);
 });
 
 socket.on('topic', function(topic) {
     if(topic.length > 14) inputBox.setLabel( topic.substr(0,14)+"…" );
     else inputBox.setLabel( topic );
+    screen.title = topic;
 });
 
 /* - KEYPRESS LISTENERS - */

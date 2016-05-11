@@ -1,6 +1,6 @@
 var blessed = require('blessed');
-var socket  = require('socket.io-client')('https://seafour.club/');
-
+//var socket  = require('socket.io-client')('https://seafour.club/');
+var socket  = require('socket.io-client')('http://52.37.212.4');
 /* Creates the 'screen' object. */
 var screen = blessed.screen({
     smartCSR:   true,
@@ -24,7 +24,7 @@ var inputBox = blessed.textarea({
     border:     { type: 'line' },
     style:      {
         fg:     'white',
-        border: { fg: 'white' }
+        border: { fg: 'magenta' }
     }
 });
 inputBox.enableDrag();
@@ -38,9 +38,29 @@ var messages = blessed.log({
     width:          '67%',
     scrollOnInput:  true,
     tags:           true,
-    border:         { type: 'line' }
+    border:         { type: 'line' },
+    style:      {
+        fg:     'white',
+        border: { fg: 'magenta' }
+    }
 });
 screen.append(messages);
+
+/* Holds system messages. */
+var systemMessages = blessed.log({
+    top:            1,
+    right:          1,
+    width:          '30%',
+    height:         '75%',
+    scrollOnInput:  true,
+    tags:           true,
+    border:         { type: 'line' },
+    style:      {
+        fg:     'white',
+        border: { fg: 'magenta' }
+    }
+});
+screen.append(systemMessages);
 
 screen.render();
 
@@ -48,6 +68,9 @@ screen.render();
 
 socket.on('userMessage', function(nick, post, id, flair) {
     messages.add("{magenta-fg}" + nick + "{/} : " + post);
+});
+socket.on('systemMessage', function(text) {
+    systemMessages.add("{yellow-fg}" + text + "{/}");
 });
 
 socket.on('topic', function(topic) {
@@ -60,7 +83,7 @@ socket.on('topic', function(topic) {
 
 /* Listens for enters. */
 inputBox.key('enter', function(ch, key) {
-    inputMessage = this.getValue();
+    inputMessage = this.getValue().substring(0, this.getValue().length -1);
 
     if ( inputMessage[0] == "." ) { /* Commands start with a period. */
         var command = inputMessage.split(" ");

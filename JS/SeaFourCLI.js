@@ -1,6 +1,6 @@
 var blessed = require('blessed');
-//var socket  = require('socket.io-client')('https://seafour.club/');
-var socket  = require('socket.io-client')('http://52.37.212.4');
+var socket  = require('socket.io-client')('https://seafour.club/');
+
 /* Creates the 'screen' object. */
 var screen = blessed.screen({
     smartCSR:   true,
